@@ -1,52 +1,50 @@
 
 
 //         Application Logic         \\
-const item = ({
-    title, 
-    dateCompleteBy=null, 
-    priority=null, 
-    complete=false
-} ={}) => {
-    const dateAdded = new Date();
-    const type = () => 'item';
-    return {title, dateAdded, dateCompleteBy, priority, complete, type}
-}
 
-const note = ({
+    //      Item Creators       \\
+const info = ({
     title, 
-    dateCompleteBy=null, 
-    priority=null, 
-    complete=false, 
-    content
-} = {}) => {
-    const dateAdded = new Date();
-    const type = () => 'note';
-    const prototype = item({title, dateCompleteBy, priority, complete,});
-    return Object.assign({}, prototype, {type, content})
-}
+    dateCompleteBy = null,
+    priority = null,
+    complete = false,
+    ...args
+}) => ({
+    title, 
+    dateAdded: new Date(), 
+    dateCompleteBy, 
+    priority, 
+    complete,
+    ...args 
+});
 
-const project = ({
-    title, 
-    dateCompleteBy=null, 
-    priority=null, 
-    complete=false, 
+const item = ({...args}) => info({
+    ...args, 
+    type: 'item'
+});
+
+const note = ({content, ...args}) => info({
+    ...args, 
+    type: 'note', 
     content
-} ={}) => {
-    const dateAdded = new Date();
-    let children = [];
-    const type = () => 'project';
-    const prototype = note({title, dateCompleteBy, priority, complete, content});
-    return Object.assign({}, prototype, {type, children})
-}
+});
+
+const project = ({content, children=[], ...args}) => info({
+    ...args, 
+    type:'project', 
+    content, 
+    children});
+
+
 
 
 //          Tests/Inits         \\
-let testItem = item({title: 'to-do'});
-console.log(testItem);
+let testItem = item({title: 'to-do', dateCompleteBy: null, priority: 'top', complete: true});
+// console.log(testItem);
 
-let testNote = note({title: 'buncha', content:'hooplah'});
-console.log(testNote.content);
+let testNote = note({title: 'buncha', content:'hooplah', complete: true, priority:'numba1'});
+// console.log(testNote);
 
-let testProject = project('whole bunch of', 'hooplah')
+let testProject = project({title:'whole bunch of', content:'hooplah'});
 testProject.children=[testItem, testNote]
 console.log(testProject.children);
