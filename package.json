@@ -1,0 +1,23 @@
+{
+  "name": "to-do",
+  "version": "1.0.0",
+  "description": "to do list",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/nima-m-git/to-do-list.git"
+  },
+  "author": "Nima M",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/nima-m-git/to-do-list/issues"
+  },
+  "homepage": "https://github.com/nima-m-git/to-do-list#readme",
+  "devDependencies": {
+    "webpack": "^4.43.0",
+    "webpack-cli": "^3.3.11"
+  }
+}
