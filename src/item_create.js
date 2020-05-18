@@ -17,7 +17,6 @@ const task = ({
     description = '', 
     dateCompleteBy = null, 
     priority = null,
-    complete = false,
     ...args
 }) => info({
     ...args, 
@@ -25,7 +24,7 @@ const task = ({
     description, 
     dateCompleteBy,
     priority, 
-    complete,
+    complete: false,
     completeTask() {
         this.complete = (this.complete==false)? true : false
     },
