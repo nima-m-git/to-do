@@ -26,8 +26,8 @@ let mainProjects = []
 
 //          Tests/Inits             \\
     //      Sample Items        \\
-let testItem = task({title: 'to-do', dateCompleteBy: null, priority: 'top', complete: true, description: 'your first item',});
-let testNote = task({title: 'buncha', note:'hooplah', complete: true, priority:'numba1', description: 'your first note',});
+let testItem = task({title: 'to-do', dateCompleteBy: null, priority: 'Top', complete: true, description: 'your first item',});
+let testNote = task({title: 'buncha', complete: true, priority:'Low', description: 'your first note',});
 const testProject = project({title:'General', children: [testItem, testNote]});
 let testProjectTwo = project({title: 'who',});
 mainProjects.push(testProject, testProjectTwo);
@@ -57,7 +57,7 @@ function newProject() {
 } 
 
 
-function newTask() {
+function newTask(submitButton) {
     exitBox(viewBox);
     // function makeDOMInput({property, type, maxLength=null}){
     //     const label = document.createElement('label');
@@ -81,23 +81,23 @@ function newTask() {
 
     const dateCompleteByLabel = document.createElement('label');
     const dateCompleteBy = document.createElement('input');
-    dateCompleteByLabel.for = dateCompleteByLabel.textContent = dateCompleteBy.id = 'completeBy';
+    dateCompleteByLabel.for = dateCompleteByLabel.textContent = dateCompleteBy.id = 'dateCompleteBy';
     dateCompleteBy.type='date';
 
 
     const priorityLabel = document.createElement('label');
     const selectPriority = document.createElement('select');
-    priorityLabel.for = priorityLabel.textContent = selectPriority.id = 'priority';
+    priorityLabel.for = selectPriority.id = priorityLabel.textContent = 'priority';
     const selections = ['Top', 'High', 'Mid', 'Low'];
     selections.map(selection => {
         const option = document.createElement('option');
-        option.value = selection;
-        option.textContent = selection;
+        option.value = option.textContent = option.id = selection;
         selectPriority.appendChild(option); 
     })
 
     const projectLabel = document.createElement('label');
     const selectProject = document.createElement('select');
+    projectLabel.id = 'projectLabel'; 
     projectLabel.for = projectLabel.textContent = selectProject.id = 'project';
     mainProjects.map(project => {
         const option = document.createElement('option');
@@ -106,6 +106,13 @@ function newTask() {
         selectProject.appendChild(option);
     })
 
+
+
+    const children = [titleLabel, title, descriptionLabel, description, dateCompleteByLabel, dateCompleteBy, priorityLabel, selectPriority, projectLabel, selectProject, submitButton];
+    children.map(child => viewBox.appendChild(child));
+}
+
+function submitNewTaskBtn(){
     const submitButton = document.createElement('input')
     submitButton.type = submitButton.value = 'submit';
 
@@ -116,17 +123,16 @@ function newTask() {
             title: title.value,
             description: description.value,
             dateCompleteBy: dateCompleteBy.value,
-            priority: selectPriority.value,
+            priority: priority.value,
         });
         project.children.push(newTask);
         displayMainProjects();
         displayFocusedProject.bind(project)();
         exitBox(viewBox);
     }
-
-    const children = [titleLabel, title, descriptionLabel, description, dateCompleteByLabel, dateCompleteBy, priorityLabel, selectPriority, projectLabel, selectProject, submitButton];
-    children.map(child => viewBox.appendChild(child));
+    return submitButton
 }
+
 
 function exitBox(node) {
     node.textContent = '';
@@ -135,39 +141,35 @@ function exitBox(node) {
     //      Edit        \\
 function edit(){
     exitBox(viewBox);
-
     const jsItem = this;
-    const editables = ['title', 'description', 'dateCompleteBy'];
+    newTask(submitEditBtn.apply(jsItem));
 
-    createDOMItems(viewBox, jsItem);
-    let DOMitem = document.getElementById('viewBox').querySelector('div');
+    (function() {
+        document.getElementById('title').value = jsItem.title;
+        document.getElementById('description').value = jsItem.description;
+        document.getElementById('dateCompleteBy').defaultValue = jsItem.dateCompleteBy;
+        // set priority
+        document.getElementById('project').remove()
+        document.getElementById('projectLabel').remove()
+    })();
 
-    function submitButton(){
-        const btn = document.createElement('button');
-        btn.textContent = 'Submit';
+    function submitEditBtn(){
+        const btn = document.createElement('input');
+        btn.type = btn.value = 'submit';
+        let currentTask = this;
         btn.onclick = function() {
-            editables.map(property => {
-                jsItem[property] = DOMitem.querySelector(`.${property}`).textContent;
-            })
+            const editedTask = task({
+                title: title.value,
+                description: description.value,
+                dateCompleteBy: dateCompleteBy.value,
+                priority: priority.value,
+            });
+            Object.assign(currentTask, editedTask, {id: currentTask.id})
             displayFocusedProject.apply(currentProject); // update focused box
             exitBox(viewBox);
         }
-        DOMitem.appendChild(btn);
+        return btn
     }
-    submitButton();
-    makeEditable();
-
-    function makeEditable(){    /// improve editability
-        DOMitem.childNodes.forEach((child) => {
-            editables.map(property => {
-                if (child.classList.contains(property)) {
-                    child.contentEditable = (child.contentEditable==true)? false : true;
-                }
-            })
-            }
-        )
-    }
-
 }
 
 
@@ -220,7 +222,9 @@ function editBtn(){
 
 //      Event Listeners     \\
 document.getElementById('newProject').addEventListener('click', newProject);
-document.getElementById('newTask').addEventListener('click', newTask);
+document.getElementById('newTask').addEventListener('click', ()=>{
+    newTask(submitNewTaskBtn());
+});
 
 
 export {edit,}
