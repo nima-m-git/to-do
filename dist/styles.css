@@ -1,4 +1,4 @@
-.dateCompleteBy, .complete, .priority, .content, .type {
+.type {
     display: none;
 }
 
@@ -11,7 +11,7 @@
 
 .project {
     font-size: 18px;
-    border: 1px solid black;
+    border: 3px solid black;
 }
 
 .project .item, .project .note {
@@ -19,5 +19,9 @@
 }
 
 #focusedBox {
-    border: 1px solid green;
+    border: 3px solid green;
+}
+
+#viewBox {
+    border: 3px solid red;
 }
