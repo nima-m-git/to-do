@@ -5,7 +5,7 @@ const mainBox = document.createElement('div')
 mainBox.id = 'mainBox';
 
 // 
-function createDOMItems (parentNode, item, buttonFunc=null) {
+function createDOMItems (parentNode, item, ...buttons) {
     const newItemDiv = document.createElement('div');
     newItemDiv.classList += item.type;
     newItemDiv.id = item.id;
@@ -16,9 +16,12 @@ function createDOMItems (parentNode, item, buttonFunc=null) {
         newPropertyDiv.innerHTML = ((typeof item[property] == 'string' /*|| typeof item[property] == 'object'*/)? item[property] : '');
         newItemDiv.appendChild(newPropertyDiv);
     }
-    if (!!buttonFunc){
-        newItemDiv.appendChild(buttonFunc());
+    if (buttons){
+        for (let button of buttons){
+            newItemDiv.appendChild(button());
+        }
     }
+
 
     parentNode.appendChild(newItemDiv);
     return newItemDiv

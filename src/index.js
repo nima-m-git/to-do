@@ -18,10 +18,9 @@ const viewBox = document.createElement('div');
 viewBox.setAttribute('id', 'viewBox');
 body.appendChild(viewBox) // hidden by default
 
+
 //          Items           \\
 let mainProjects = []
-
-
 
 
 //          Tests/Inits             \\
@@ -31,6 +30,7 @@ let testNote = task({title: 'buncha', complete: true, priority:'Low', descriptio
 const testProject = project({title:'General', children: [testItem, testNote]});
 let testProjectTwo = project({title: 'who',});
 mainProjects.push(testProject, testProjectTwo);
+
 
     //      Add New     \\
 function newProject() {
@@ -106,9 +106,7 @@ function newTask(submitButton) {
         selectProject.appendChild(option);
     })
 
-
-
-    const children = [titleLabel, title, descriptionLabel, description, dateCompleteByLabel, dateCompleteBy, priorityLabel, selectPriority, projectLabel, selectProject, submitButton];
+    const children = [titleLabel, title, descriptionLabel, description, dateCompleteByLabel, dateCompleteBy, priorityLabel, selectPriority, projectLabel, selectProject, submitButton, deleteButton];
     children.map(child => viewBox.appendChild(child));
 }
 
@@ -133,7 +131,6 @@ function submitNewTaskBtn(){
     return submitButton
 }
 
-
 function exitBox(node) {
     node.textContent = '';
 }
@@ -152,26 +149,43 @@ function edit(){
         document.getElementById('project').remove()
         document.getElementById('projectLabel').remove()
     })();
-
-    function submitEditBtn(){
-        const btn = document.createElement('input');
-        btn.type = btn.value = 'submit';
-        let currentTask = this;
-        btn.onclick = function() {
-            const editedTask = task({
-                title: title.value,
-                description: description.value,
-                dateCompleteBy: dateCompleteBy.value,
-                priority: priority.value,
-            });
-            Object.assign(currentTask, editedTask, {id: currentTask.id})
-            displayFocusedProject.apply(currentProject); // update focused box
-            exitBox(viewBox);
-        }
-        return btn
-    }
 }
 
+function submitEditBtn(){
+    const btn = document.createElement('input');
+    btn.type = btn.value = 'submit';
+    let currentTask = this;
+    btn.onclick = function() {
+        const editedTask = task({
+            title: title.value,
+            description: description.value,
+            dateCompleteBy: dateCompleteBy.value,
+            priority: priority.value,
+        });
+        Object.assign(currentTask, editedTask, {id: currentTask.id})
+        displayFocusedProject.apply(currentProject); // update focused box
+        exitBox(viewBox);
+    }
+    return btn
+}
+
+    //      Delete      \\
+function removeTaskBtn() {
+    const btn = document.createElement('button');
+    btn.classList = btn.textContent = 'remove';
+    btn.value = this.id;
+    btn.onclick = removeTask.bind(this);
+    return btn     
+}
+
+function removeTask() {
+    const index = currentProject.children.findIndex((task) => task.id=this.id);
+    currentProject.children.splice(index, index+1)
+
+    //refresh
+    exitBox(focusedBox);
+    displayFocusedProject.apply(currentProject);
+}
 
     //      Main Box Initialize     \\
 function displayMainProjects() {
@@ -202,7 +216,7 @@ function displayFocusedProject() {
     focusedBox.appendChild(title);
 
     for (let child of this.children) {
-        createDOMItems(focusedBox, child, editBtn.bind(child));
+        createDOMItems(focusedBox, child, editBtn.bind(child), removeTaskBtn.bind(child));
         
         // toggle display class
     }
