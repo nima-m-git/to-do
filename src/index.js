@@ -20,7 +20,29 @@ body.appendChild(viewBox) // hidden by default
 
 
 //          Items           \\
-let mainProjects = []
+const projects = (function () {
+    const mainProjects = [];
+    const addProjects = (...project) => mainProjects.push(...project);
+    const removeProject = (project) => {
+        let index = mainProjects.findIndex((main) => main.id == project.id);
+        mainProjects.splice(index, 1);
+    }
+
+    const setCurrentProject = (project) => projects.currentProject = project;
+    // const removeTask = (task) => {
+    //     let index = currentProject.findIndex(main => main.id == task.id);
+    //     projects.currentProject.children.splice(index, 1);
+    // } NOT SEEING currentProject
+
+    return {
+        mainProjects,
+        addProjects,
+        removeProject,
+        currentProject: null,
+        setCurrentProject,
+        removeTask
+    }
+}());
 
 
 //          Tests/Inits             \\
@@ -29,7 +51,7 @@ let testItem = task({title: 'to-do', dateCompleteBy: null, priority: 'Top', comp
 let testNote = task({title: 'buncha', complete: true, priority:'Low', description: 'your first note',});
 const testProject = project({title:'General', children: [testItem, testNote]});
 let testProjectTwo = project({title: 'who',});
-mainProjects.push(testProject, testProjectTwo);
+projects.addProjects(testProject, testProjectTwo);
 
 
     //      Add New     \\
@@ -47,7 +69,7 @@ function newProject() {
     submitButton.value = 'Submit';
 
     submitButton.onclick = function() {
-        mainProjects.push(project({title: title.value,}))
+        projects.addProjects(project({title: title.value,}))
         displayMainProjects();
         exitBox(viewBox);
     }
@@ -99,7 +121,7 @@ function newTask(submitButton) {
     const selectProject = document.createElement('select');
     projectLabel.id = 'projectLabel'; 
     projectLabel.for = projectLabel.textContent = selectProject.id = 'project';
-    mainProjects.map(project => {
+    projects.mainProjects.map(project => {
         const option = document.createElement('option');
         option.value = project.id;
         option.textContent = project.title;
@@ -116,23 +138,22 @@ function submitNewTaskBtn(){
 
     submitButton.onclick = function() {
         const projectID = document.getElementById('project').value;
-        const project = mainProjects.filter(project => project.id == projectID)[0];
+        const project = projects.mainProjects.filter(project => project.id == projectID)[0];
+
         const newTask = task({
             title: title.value,
             description: description.value,
             dateCompleteBy: dateCompleteBy.value,
             priority: priority.value,
         });
+
         project.children.push(newTask);
+
         displayMainProjects();
-        displayFocusedProject.bind(project)();
+        displayFocusedProject.apply(project);
         exitBox(viewBox);
     }
     return submitButton
-}
-
-function exitBox(node) {
-    node.textContent = '';
 }
 
     //      Edit        \\
@@ -151,6 +172,15 @@ function edit(){
     })();
 }
 
+function editBtn(){
+    const btn = document.createElement('button');
+    btn.classList = btn.textContent = 'edit';
+    btn.value = this.id;
+    btn.onclick = edit.bind(this);
+    return btn        
+}
+
+
 function submitEditBtn(){
     const btn = document.createElement('input');
     btn.type = btn.value = 'submit';
@@ -163,7 +193,7 @@ function submitEditBtn(){
             priority: priority.value,
         });
         Object.assign(currentTask, editedTask, {id: currentTask.id})
-        displayFocusedProject.apply(currentProject); // update focused box
+        displayFocusedProject.bind(projects.currentProject); // update focused box
         exitBox(viewBox);
     }
     return btn
@@ -179,33 +209,27 @@ function removeTaskBtn() {
 }
                     
 function removeTask() {
-
     if (this.type == 'Task'){
-        const index = currentProject.children.findIndex((task) => task.id==this.id)
-        currentProject.children.splice(index, index+1)
+        // projects.removeTask(this); NOT SEEING CURRENTPROJECT
+        const index = projects.currentProject.children.findIndex((task) => task.id==this.id)
+        projects.currentProject.children.splice(index, 1)
 
         exitBox(focusedBox);
-        displayFocusedProject.apply(currentProject);
+        displayFocusedProject.apply(projects.currentProject);
 
     } else if (this.type == 'project'){
-        const index = mainProjects.findIndex((project) => project.id==this.id);
-        mainProjects.splice(index, index+1)
+        projects.removeProject(this);
 
-        exitBox(mainProjects)
-        exitBox(focusedBox)
+        exitBox(focusedBox);
         displayMainProjects();
     }
-
-
-    //refresh
-
 }
 
 
     //      Main Box Initialize     \\
 function displayMainProjects() {
     mainBox.textContent='';
-    for (let project of mainProjects){
+    for (let project of projects.mainProjects){
         let parentDiv = createDOMItems(mainBox, project, viewBtn.bind(project));
     }
 }
@@ -220,34 +244,30 @@ function viewBtn(){
 
 displayMainProjects();
 
-let currentProject; //remove global, binds current focusedproject project to target refresh after edit
+
 //          Focused         \\
 function displayFocusedProject() {
     exitBox(focusedBox);
 
+    const currentProject = this;
+
     const project = document.createElement('div');
     project.classList += 'title';
-    project.innerHTML = this.title;
-    project.appendChild(removeTaskBtn.bind(this)())
+    project.innerHTML = currentProject.title;
+    project.appendChild(removeTaskBtn.bind(currentProject)())
     focusedBox.appendChild(project);
 
-    for (let child of this.children) {
+    for (let child of currentProject.children) {
         createDOMItems(focusedBox, child, editBtn.bind(child), removeTaskBtn.bind(child));
         
         // toggle display class
     }
-    currentProject = this;
+    projects.setCurrentProject(currentProject);
 }
 
-function editBtn(){
-    const btn = document.createElement('button');
-    btn.classList = btn.textContent = 'edit';
-    btn.value = this.id;
-    btn.onclick = edit.bind(this);
-    return btn        
+function exitBox(node) {
+    node.textContent = '';
 }
-
-
 
 
 //      Event Listeners     \\
