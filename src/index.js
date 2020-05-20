@@ -106,7 +106,7 @@ function newTask(submitButton) {
         selectProject.appendChild(option);
     })
 
-    const children = [titleLabel, title, descriptionLabel, description, dateCompleteByLabel, dateCompleteBy, priorityLabel, selectPriority, projectLabel, selectProject, submitButton, deleteButton];
+    const children = [titleLabel, title, descriptionLabel, description, dateCompleteByLabel, dateCompleteBy, priorityLabel, selectPriority, projectLabel, selectProject, submitButton];
     children.map(child => viewBox.appendChild(child));
 }
 
@@ -177,15 +177,30 @@ function removeTaskBtn() {
     btn.onclick = removeTask.bind(this);
     return btn     
 }
-
+                    
 function removeTask() {
-    const index = currentProject.children.findIndex((task) => task.id=this.id);
-    currentProject.children.splice(index, index+1)
+
+    if (this.type == 'Task'){
+        const index = currentProject.children.findIndex((task) => task.id==this.id)
+        currentProject.children.splice(index, index+1)
+
+        exitBox(focusedBox);
+        displayFocusedProject.apply(currentProject);
+
+    } else if (this.type == 'project'){
+        const index = mainProjects.findIndex((project) => project.id==this.id);
+        mainProjects.splice(index, index+1)
+
+        exitBox(mainProjects)
+        exitBox(focusedBox)
+        displayMainProjects();
+    }
+
 
     //refresh
-    exitBox(focusedBox);
-    displayFocusedProject.apply(currentProject);
+
 }
+
 
     //      Main Box Initialize     \\
 function displayMainProjects() {
@@ -210,10 +225,11 @@ let currentProject; //remove global, binds current focusedproject project to tar
 function displayFocusedProject() {
     exitBox(focusedBox);
 
-    const title = document.createElement('div');
-    title.classList += 'title';
-    title.innerHTML = this.title;
-    focusedBox.appendChild(title);
+    const project = document.createElement('div');
+    project.classList += 'title';
+    project.innerHTML = this.title;
+    project.appendChild(removeTaskBtn.bind(this)())
+    focusedBox.appendChild(project);
 
     for (let child of this.children) {
         createDOMItems(focusedBox, child, editBtn.bind(child), removeTaskBtn.bind(child));
