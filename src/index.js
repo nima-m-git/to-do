@@ -20,7 +20,7 @@ body.appendChild(viewBox) // hidden by default
 
 
 //          Items           \\
-const projects = (function () {
+const projects = (function() {
     const mainProjects = [];
     const addProjects = (...project) => mainProjects.push(...project);
     const removeProject = (project) => {
@@ -28,21 +28,22 @@ const projects = (function () {
         mainProjects.splice(index, 1);
     }
 
+    let currentProject = mainProjects[0];
     const setCurrentProject = (project) => projects.currentProject = project;
-    // const removeTask = (task) => {
-    //     let index = currentProject.findIndex(main => main.id == task.id);
-    //     projects.currentProject.children.splice(index, 1);
-    // } NOT SEEING currentProject
+    const removeTask = (task) => {
+        let index = projects.currentProject.children.findIndex(main => main.id == task.id);
+        projects.currentProject.children.splice(index, 1);
+    } 
 
     return {
         mainProjects,
         addProjects,
         removeProject,
-        currentProject: null,
+        currentProject,
         setCurrentProject,
         removeTask
     }
-}());
+})();
 
 
 //          Tests/Inits             \\
@@ -54,7 +55,7 @@ let testProjectTwo = project({title: 'who',});
 projects.addProjects(testProject, testProjectTwo);
 
 
-    //      Add New     \\
+    //      Add      \\
 function newProject() {
     exitBox(viewBox);
     const label = document.createElement('label');
@@ -209,10 +210,9 @@ function removeTaskBtn() {
 }
                     
 function removeTask() {
+    console.log(projects.currentProject)
     if (this.type == 'Task'){
-        // projects.removeTask(this); NOT SEEING CURRENTPROJECT
-        const index = projects.currentProject.children.findIndex((task) => task.id==this.id)
-        projects.currentProject.children.splice(index, 1)
+        projects.removeTask(this); 
 
         exitBox(focusedBox);
         displayFocusedProject.apply(projects.currentProject);
@@ -249,26 +249,23 @@ displayMainProjects();
 function displayFocusedProject() {
     exitBox(focusedBox);
 
-    const currentProject = this;
-
     const project = document.createElement('div');
     project.classList += 'title';
-    project.innerHTML = currentProject.title;
-    project.appendChild(removeTaskBtn.bind(currentProject)())
+    project.innerHTML = this.title;
+    project.appendChild(removeTaskBtn.bind(this)())
     focusedBox.appendChild(project);
 
-    for (let child of currentProject.children) {
+    for (let child of this.children) {
         createDOMItems(focusedBox, child, editBtn.bind(child), removeTaskBtn.bind(child));
         
         // toggle display class
     }
-    projects.setCurrentProject(currentProject);
+    projects.setCurrentProject(this);
 }
 
 function exitBox(node) {
     node.textContent = '';
 }
-
 
 //      Event Listeners     \\
 document.getElementById('newProject').addEventListener('click', newProject);
