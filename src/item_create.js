@@ -20,7 +20,7 @@ const task = ({
     ...args
 }) => info({
     ...args, 
-    type: 'Task',
+    type: 'task',
     description, 
     dateCompleteBy,
     priority, 

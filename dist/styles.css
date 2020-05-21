@@ -43,3 +43,8 @@ header {
     height: 100px;
     width: 200px;
 }
+
+.complete {
+    text-decoration: line-through;
+    text-decoration-thickness: 10px;
+}

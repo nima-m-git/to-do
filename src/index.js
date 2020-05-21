@@ -3,17 +3,6 @@ import {task, project} from './item_create.js'
 
 //         Application Logic         \\
     //      DOM Elements        \\
-function exitButton(box) {
-    const button = document.createElement('button');
-    button.textContent = 'X';
-    button.value = 'exit';
-
-    button.onclick = function(){
-        exitBox(box)
-    }
-    box.appendChild(button)
-}
-
 const body = document.querySelector('body');
 
 const containerBox = document.createElement('div');
@@ -99,8 +88,6 @@ const newProject = () => {
     const children = [label, title, submitProjectButton(title)];
     children.map(child => viewBox.appendChild(child))
 } 
-
-
 
 
 function newTask(submitButton) {
@@ -235,16 +222,13 @@ function removeTaskBtn() {
 }
                     
 function removeTask() {
-    if (this.type == 'Task'){
+    exitBox(focusedBox);
+    if (this.type == 'task'){
         projects.removeTask(this); 
-
-        exitBox(focusedBox);
         displayFocusedProject.apply(projects.currentProject);
 
     } else if (this.type == 'project'){
         projects.removeProject(this);
-
-        exitBox(focusedBox);
         displayMainProjects();
     }
 }
@@ -266,9 +250,6 @@ function viewBtn(){
     return btn     
 }
 
-displayMainProjects();
-
-
 //          Focused         \\
 function displayFocusedProject() {
     exitBox(focusedBox);
@@ -278,18 +259,36 @@ function displayFocusedProject() {
     project.classList += 'title';
     project.innerHTML = this.title;
     project.appendChild(removeTaskBtn.bind(this)())
+    project.appendChild(completeBtn.bind(this)())
     focusedBox.appendChild(project);
 
     for (let child of this.children) {
-        createDOMItems(focusedBox, child, editBtn.bind(child), removeTaskBtn.bind(child));
+        createDOMItems(focusedBox, child, editBtn.bind(child), removeTaskBtn.bind(child), completeBtn.bind(child));
         
         // toggle display class
     }
     projects.setCurrentProject(this);
 }
 
+
 function exitBox(node) {
     node.textContent = '';
+}
+
+function exitButton(box) {
+    const button = document.createElement('button');
+    button.textContent = 'X';
+    button.value = 'exit';
+    button.onclick = () => exitBox(box);
+    box.appendChild(button)
+}
+
+function completeBtn() {
+    const button = document.createElement('button');
+    button.textContent = 'Complete';
+    button.value = 'complete';
+    button.onclick = () => document.getElementById(this.id).classList.toggle('complete');
+    return button
 }
 
 //      Event Listeners     \\
@@ -298,5 +297,10 @@ document.getElementById('newTask').addEventListener('click', ()=>{
     newTask(submitNewTaskBtn());
 });
 
+   
+
+
+//      Init        \\
+displayMainProjects();
 
 export {edit,}
