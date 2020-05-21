@@ -2,21 +2,37 @@ import {createDOMItems} from './pageLoad.js'
 import {task, project} from './item_create.js'
 
 //         Application Logic         \\
-//      DOM Elements        \\
+    //      DOM Elements        \\
+function exitButton(box) {
+    const button = document.createElement('button');
+    button.textContent = 'X';
+    button.value = 'exit';
+
+    button.onclick = function(){
+        exitBox(box)
+    }
+    box.appendChild(button)
+}
+
 const body = document.querySelector('body');
+
+const containerBox = document.createElement('div');
+containerBox.setAttribute('id', 'containerBox');
 
 const mainBox = document.createElement('div');
 mainBox.setAttribute('id', 'mainBox');
-mainBox.innerHTML = `<h2>Main Projects</h2>`;
-body.appendChild(mainBox);
 
 const focusedBox = document.createElement('div');
 focusedBox.setAttribute('id', 'focusedBox');
-body.appendChild(focusedBox)
+
 
 const viewBox = document.createElement('div');
 viewBox.setAttribute('id', 'viewBox');
-body.appendChild(viewBox) // hidden by default
+
+
+
+[mainBox, focusedBox, viewBox].map((box) => containerBox.appendChild(box));
+body.appendChild(containerBox);
 
 
 //          Items           \\
@@ -56,8 +72,23 @@ projects.addProjects(testProject, testProjectTwo);
 
 
     //      Add      \\
-function newProject() {
+const submitProjectButton = (title) => {
+    const submitButton = document.createElement('input')
+    submitButton.type = 'submit';
+    submitButton.value = 'Submit';
+    
+    submitButton.onclick = function() {
+        projects.addProjects(project({title: title.value,}))
+        displayMainProjects();
+        exitBox(viewBox);
+    }
+    return submitButton    
+}
+
+const newProject = () => {
     exitBox(viewBox);
+    exitButton(viewBox)
+
     const label = document.createElement('label');
     label.for = 'title';
     label.textContent = 'Title:';
@@ -65,23 +96,16 @@ function newProject() {
     title.type='text'
     title.id = 'newTitle';
 
-    const submitButton = document.createElement('input')
-    submitButton.type = 'submit';
-    submitButton.value = 'Submit';
-
-    submitButton.onclick = function() {
-        projects.addProjects(project({title: title.value,}))
-        displayMainProjects();
-        exitBox(viewBox);
-    }
-
-    const children = [label, title, submitButton];
+    const children = [label, title, submitProjectButton(title)];
     children.map(child => viewBox.appendChild(child))
 } 
 
 
+
+
 function newTask(submitButton) {
     exitBox(viewBox);
+    exitButton(viewBox);
     // function makeDOMInput({property, type, maxLength=null}){
     //     const label = document.createElement('label');
     //     const input = document.createElement('input');
@@ -97,9 +121,8 @@ function newTask(submitButton) {
     title.type='text';
 
     const descriptionLabel = document.createElement('label');
-    const description = document.createElement('input');
+    const description = document.createElement('textarea');
     descriptionLabel.for = descriptionLabel.textContent = description.id = 'description';
-    description.type='text';
     description.maxLength = '200';
 
     const dateCompleteByLabel = document.createElement('label');
@@ -160,6 +183,8 @@ function submitNewTaskBtn(){
     //      Edit        \\
 function edit(){
     exitBox(viewBox);
+    exitButton(viewBox);
+
     const jsItem = this;
     newTask(submitEditBtn.apply(jsItem));
 
@@ -210,7 +235,6 @@ function removeTaskBtn() {
 }
                     
 function removeTask() {
-    console.log(projects.currentProject)
     if (this.type == 'Task'){
         projects.removeTask(this); 
 
@@ -248,6 +272,7 @@ displayMainProjects();
 //          Focused         \\
 function displayFocusedProject() {
     exitBox(focusedBox);
+    exitButton(focusedBox);
 
     const project = document.createElement('div');
     project.classList += 'title';

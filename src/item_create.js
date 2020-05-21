@@ -24,10 +24,6 @@ const task = ({
     description, 
     dateCompleteBy,
     priority, 
-    complete: false,
-    completeTask() {
-        this.complete = (this.complete==false)? true : false
-    },
 });
 
 
