@@ -44,6 +44,7 @@ const projects = (function () {
   //   };
 
   //   const currentProject = mainProjects[0];
+
   const setCurrentProject = (project) => {
     projects.currentProject = project
   };
@@ -64,6 +65,7 @@ const projects = (function () {
     getMainProjects,
     addProject,
     removeProject,
+    getProject,
     currentProject,
     setCurrentProject,
     addTask,
@@ -74,24 +76,25 @@ const projects = (function () {
 
 //          Tests/Inits             \\
 //      Sample Items        \\
-const generalProject = project({ title: 'General' })
-const testProjectTwo = project({ title: 'who' })
-const testItem = task({
-  title: 'to-do',
-  dateCompleteBy: null,
-  priority: 'Top',
-  complete: true,
-  description: 'your first item'
-})
-const testNote = task({
-  title: 'buncha',
-  complete: true,
-  priority: 'Low',
-  description: 'your first note'
-})
+// const generalProject = project({ title: 'General' })
+// const testProjectTwo = project({ title: 'who' })
+// const testItem = task({
+//   title: 'to-do',
+//   dateCompleteBy: null,
+//   priority: 'Top',
+//   complete: true,
+//   description: 'your first item'
+// })
+// const testNote = task({
+//   title: 'buncha',
+//   complete: true,
+//   priority: 'Low',
+//   description: 'your first note'
+// })
 
-generalProject.children.push(testItem, testNote);
-[generalProject, testProjectTwo].map((project) => projects.addProject(project))
+// generalProject.children.push(testItem, testNote);
+// [generalProject, testProjectTwo].map((project) => projects.addProject(project))
+// console.log(projects.getMainProjects())
 
 
 //      Add      \\
@@ -100,7 +103,7 @@ const submitProjectButton = (title) => {
   submitButton.type = 'submit'
   submitButton.value = 'Submit'
   submitButton.onclick = function () {
-    projects.addProject(project)
+    projects.addProject(project({ title: title.value}))
     displayMainProjects()
     exitBox(viewBox)
   };
@@ -206,12 +209,12 @@ function submitNewTaskBtn () {
       priority: priority.value
     })
 
-    projects.addTask(project, newTask)
+    projects.addTask(project, newTask);
     // project.children.push(newTask);
     console.log(Object.values(localStorage).map(project => JSON.parse(project)))
 
-    displayMainProjects()
-    displayFocusedProject.apply(project)
+    displayMainProjects()// Unessecary? 
+    displayFocusedProject.apply(projects.getProject(project))
     exitBox(viewBox)
   };
   return submitButton
@@ -300,8 +303,8 @@ function viewBtn () {
 
 //          Focused         \\
 function displayFocusedProject () {
-  exitBox(focusedBox)
-  exitButton(focusedBox)
+  exitBox(focusedBox);
+  exitButton(focusedBox);
 
   const project = document.createElement('div')
   project.classList += 'title'
@@ -318,7 +321,6 @@ function displayFocusedProject () {
       removeTaskBtn.bind(child),
       completeBtn.bind(child)
     )
-
     // TODO: toggle display class
   }
   projects.setCurrentProject(this)
