@@ -1,13 +1,32 @@
-#containerBox {
-    display: flex;
-}
-
 body {
     background-color: rgb(179, 235, 235);
     font-family: Arial, Helvetica, sans-serif;
 }
 
-.type {
+#containerBox {
+    display: flex;
+    background-color: seashell;
+}
+
+#mainBox {
+    width: 100px;
+}
+
+#focusedBox {
+    width: 300px;
+    border: 3px solid green;
+}
+
+#viewBox {
+    border: 1px solid red;
+}
+
+#viewBox #description {
+    height: 100px;
+    width: 200px;
+}
+
+.type, .dateAdded {
     display: none;
 }
 
@@ -31,18 +50,6 @@ header {
     font-size: 16px;
 }
 
-#focusedBox {
-    border: 3px solid green;
-}
-
-#viewBox {
-    border: 3px solid red;
-}
-
-#viewBox #description {
-    height: 100px;
-    width: 200px;
-}
 
 .complete {
     text-decoration: line-through;
