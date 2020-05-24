@@ -52,6 +52,7 @@ const projects = (function () {
   const removeTask = (task) => {
     const index = projects.currentProject.children.findIndex((main) => main.id == task.id)
     projects.currentProject.children.splice(index, 1)
+    projects.addProject(projects.currentProject);
   };
 
   return {
@@ -73,7 +74,6 @@ const submitProjectButton = (title) => {
   submitButton.value = 'Submit'
   submitButton.onclick = function () {
     const newProject = project({ title: title.value})
-    console.log(newProject)
     projects.addProject(newProject)
     displayMainProjects()
     exitBox(viewBox)
@@ -193,23 +193,18 @@ function edit () {
   exitButton(viewBox)
 
   newTask(submitEditBtn.apply(this));
-
-  (function () {
-    document.getElementById('title').value = this.title
-    document.getElementById('description').value = this.description
-    document.getElementById('dateCompleteBy').defaultValue =
-      this.dateCompleteBy
-    // set priority
-    document.getElementById('project').remove()
-    document.getElementById('projectLabel').remove()
-  })()
+  document.getElementById('title').value = this.title
+  document.getElementById('description').value = this.description
+  document.getElementById('dateCompleteBy').defaultValue = this.dateCompleteBy
+  // set priority
+  document.getElementById('project').remove()
+  document.getElementById('projectLabel').remove()
 }
 
 function editBtn () {
   const btn = document.createElement('button')
   btn.classList = btn.textContent = 'edit'
   btn.value = this.id
-  console.log(this)
   btn.onclick = edit.bind(this)
   return btn
 }
@@ -220,16 +215,18 @@ function submitEditBtn () {
 
   btn.onclick = function () {
     const editedTask = task({
-      title: title.value,
-      description: description.value,
-      dateCompleteBy: dateCompleteBy.value,
-      priority: priority.value
+      title: document.getElementById('title').value,
+      description: document.getElementById('description').value,
+      dateCompleteBy: document.getElementById('dateCompleteBy').value,
+      priority: document.getElementById('priority').value
     })
-    console.log(this, 'that')
+
     Object.assign(this, editedTask, { id: this.id })
+    projects.addProject(projects.currentProject)
+
     displayFocusedProject.apply(projects.currentProject)
     exitBox(viewBox)
-  };
+  }.bind(this);
   return btn
 }
 
@@ -344,8 +341,6 @@ const sampleItems = () => {
     priority: 'Low',
     description: 'your first note'
   })
-
-generalProject.children.push(testItem, testNote);
-[generalProject, testProjectTwo].map((project) => projects.addProject(project))
-
+  generalProject.children.push(testItem, testNote);
+  [generalProject, testProjectTwo].map((project) => projects.addProject(project))
 }
